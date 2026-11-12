@@ -1,6 +1,6 @@
 # Network Intrusion Detection System (NIDS)
 
-A lightweight, Python-based Network Intrusion Detection System designed to monitor network traffic in real time, extract key packet headers, detect suspicious network activity using rule-based algorithms, compute quantitative risk scores, and persist security events in an SQLite database.
+A lightweight, Python-based Network Intrusion Detection System designed to monitor network traffic in real time, extract key packet headers, detect suspicious network activity using rule-based algorithms, compute quantitative risk scores, display real-time statistics on a modern Web Dashboard, and persist security events in an SQLite database.
 
 Based on the synopsis submitted for Bachelor of Computer Applications (BCA) at Graphic Era (Deemed to be University).
 
@@ -11,6 +11,7 @@ Based on the synopsis submitted for Bachelor of Computer Applications (BCA) at G
 ```mermaid
 flowchart TD
     A[Network Interface / Simulated Packets] -->|Raw Packets| B[Packet Capture Engine - Scapy]
+    SIM[Attack Simulator / Interactive Web Test] -->|Synthetic Packets| B
     B --> C[Packet Parser & Feature Extractor]
     C -->|IPs, Ports, Protocols, Sizes, Timestamps| D[Traffic Analyzer & Sliding Windows]
     
@@ -25,6 +26,10 @@ flowchart TD
 
     G -->|Alert Event| H[SQLite Database]
     C -->|Summary Log| H
+
+    H --> I[Flask REST API Server]
+    I --> J[Web Dashboard Chart.js & Real-time Feeds]
+    I --> K[CSV / JSON Exporter]
 ```
 
 ---
@@ -73,7 +78,28 @@ cd intrusion-detection-system
 pip install -r requirements.txt
 ```
 
-### 3. Running the Test Suite
+### 3. Running the System
+
+#### A. Interactive Web Dashboard (Recommended)
+Launches the Flask web server with real-time Chart.js visualizations, metric cards, attack simulation buttons, and CSV/JSON log downloads:
+```bash
+python main.py
+```
+Or open [http://localhost:5000](http://localhost:5000) in your browser.
+
+#### B. Terminal Demo Simulation
+Demonstrates all 4 attacks inside the terminal:
+```bash
+python main.py --mode demo
+```
+
+#### C. Live Network Capture
+Sniffs live traffic from your network card:
+```bash
+python main.py --mode live
+```
+
+### 4. Running the Test Suite
 Run the automated test suite to verify the packet parser, sliding window tracker, all 4 detection rules, and SQLite storage:
 ```bash
 python tests/test_detection.py
@@ -87,8 +113,8 @@ python tests/test_detection.py
 intrusion-detection-system/
 │
 ├── config.py                 # Thresholds, capture interface, database paths
+├── main.py                   # Unified launcher (Web, Demo, Live)
 ├── requirements.txt          # Dependencies (scapy, Flask)
-├── .gitignore                # Git ignore rules
 │
 ├── database/
 │   ├── __init__.py
@@ -101,6 +127,18 @@ intrusion-detection-system/
 │   ├── rules.py              # Detection rules (Port Scan, DoS, Repeated, ICMP)
 │   ├── risk_scorer.py        # Quantitative 0-100 risk scoring & level classification
 │   └── capture.py            # Live sniffing & packet processing engine
+│
+├── web/
+│   ├── app.py                # Flask REST API & Web endpoints
+│   ├── templates/
+│   │   └── index.html        # Interactive cybersecurity dashboard UI
+│   └── static/
+│       ├── css/style.css     # Modern dark cyber theme styling
+│       └── js/dashboard.js   # Real-time polling, Chart.js integrations & attack triggers
+│
+├── tools/
+│   ├── attack_simulator.py   # Synthetic attack traffic generator
+│   └── export_logs.py        # CSV & JSON log exporter
 │
 └── tests/
     ├── __init__.py
