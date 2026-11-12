@@ -3,136 +3,143 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NIDS Console &bull; Network Traffic & Threat Monitoring</title>
-  <link rel="stylesheet" href="/static/css/style.css">
+  <title>Network Intrusion Detection System &bull; Live Monitor</title>
+  <!-- Cache busting query string ensures browser reloads fresh CSS immediately -->
+  <link rel="stylesheet" href="/static/css/style.css?v=2.1">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
-  <!-- Application Header -->
+  <!-- App Header -->
   <header class="app-header">
-    <div class="brand-wrapper">
-      <div class="brand-icon-box">🛡️</div>
-      <div>
-        <div class="brand-title">
-          <span>Network Intrusion Detection System</span>
-          <span class="env-tag">BCA SYNOPSIS</span>
-        </div>
-        <div class="brand-subtitle">Department of Computer Applications, Graphic Era University</div>
+    <div class="brand-section">
+      <div class="brand-logo">🛡️</div>
+      <div class="brand-text">
+        <h1>
+          Intrusion Detection System
+          <span class="project-tag">BCA SYNOPSIS</span>
+        </h1>
+        <p>Department of Computer Applications &bull; Graphic Era University</p>
       </div>
     </div>
 
-    <div class="header-controls">
-      <div class="live-pill">
-        <span class="live-indicator-dot"></span>
-        <span>Engine Active</span>
+    <div class="header-actions">
+      <div class="status-badge">
+        <span class="status-dot"></span>
+        <span>Monitoring Active</span>
       </div>
-
-      <a href="/api/export/alerts/csv" class="btn" title="Export alert logs as CSV">Export CSV</a>
-      <a href="/api/export/alerts/json" class="btn" title="Export alert logs as JSON">Export JSON</a>
-      <button onclick="promptResetDatabase()" class="btn btn-danger" title="Clear all logs">Clear Logs</button>
+      <a href="/api/export/alerts/csv" class="btn" title="Download alert logs as CSV">Export CSV</a>
+      <a href="/api/export/alerts/json" class="btn" title="Download alert logs as JSON">Export JSON</a>
+      <button onclick="promptResetDatabase()" class="btn btn-danger" title="Clear all logs from database">Clear Logs</button>
     </div>
   </header>
 
-  <!-- Main View -->
-  <main class="dashboard-container">
+  <!-- Main View Area -->
+  <main class="main-layout">
 
-    <!-- Evaluation / Simulation Toolbar -->
-    <section class="toolbar-panel">
-      <div class="toolbar-label">
-        <span>Attack Scenario Testing:</span>
+    <!-- Attack Testing Toolbar -->
+    <section class="action-bar">
+      <div class="action-bar-label">
+        <strong>Security Evaluation:</strong>
+        <span>Trigger test traffic patterns to evaluate rule algorithms</span>
       </div>
-      <div class="toolbar-buttons">
+      <div class="action-buttons">
         <button onclick="triggerSimulation('benign', this)" class="btn">Normal Traffic</button>
         <button onclick="triggerSimulation('portscan', this)" class="btn">Port Scan</button>
-        <button onclick="triggerSimulation('traffic', this)" class="btn">DoS Burst</button>
-        <button onclick="triggerSimulation('repeated', this)" class="btn">Repeated Connections</button>
+        <button onclick="triggerSimulation('traffic', this)" class="btn">DoS Flood</button>
+        <button onclick="triggerSimulation('repeated', this)" class="btn">Repeated Conn</button>
         <button onclick="triggerSimulation('icmp', this)" class="btn">ICMP Flood</button>
-        <button onclick="triggerSimulation('all', this)" class="btn btn-primary">Run All Scenarios</button>
+        <button onclick="triggerSimulation('all', this)" class="btn btn-primary">Run All Attacks</button>
       </div>
     </section>
 
-    <!-- Key Metrics Grid -->
-    <section class="metrics-grid">
-      <div class="metric-box">
-        <div class="metric-meta">
-          <span class="metric-caption">Packets Captured</span>
+    <!-- Key Metrics 4-Column Row -->
+    <section class="metrics-row">
+      <div class="metric-card">
+        <div class="metric-header">
+          <span class="metric-title">Packets Captured</span>
+          <span class="metric-icon">📦</span>
         </div>
-        <div class="metric-number" id="stat-packets">0</div>
-        <div class="metric-subtext">Total analyzed network frames</div>
+        <div class="metric-value" id="stat-packets">0</div>
+        <div class="metric-footer">Analyzed through Scapy sniffer</div>
       </div>
 
-      <div class="metric-box">
-        <div class="metric-meta">
-          <span class="metric-caption">Total Alerts</span>
+      <div class="metric-card">
+        <div class="metric-header">
+          <span class="metric-title">Security Alerts</span>
+          <span class="metric-icon">⚠️</span>
         </div>
-        <div class="metric-number" id="stat-alerts" style="color: var(--risk-med-text);">0</div>
-        <div class="metric-subtext">Heuristic rule detections</div>
+        <div class="metric-value" id="stat-alerts" style="color: var(--risk-med-text);">0</div>
+        <div class="metric-footer">Heuristic rules triggered</div>
       </div>
 
-      <div class="metric-box">
-        <div class="metric-meta">
-          <span class="metric-caption">High Severity Alerts</span>
+      <div class="metric-card">
+        <div class="metric-header">
+          <span class="metric-title">High Risk Incidents</span>
+          <span class="metric-icon">🚨</span>
         </div>
-        <div class="metric-number" id="stat-high-risk" style="color: var(--risk-high-text);">0</div>
-        <div class="metric-subtext">Risk score &gt; 70</div>
+        <div class="metric-value" id="stat-high-risk" style="color: var(--risk-high-text);">0</div>
+        <div class="metric-footer">Severity rating &ge; 71</div>
       </div>
 
-      <div class="metric-box">
-        <div class="metric-meta">
-          <span class="metric-caption">Threat Sources</span>
+      <div class="metric-card">
+        <div class="metric-header">
+          <span class="metric-title">Flagged Threat Hosts</span>
+          <span class="metric-icon">🎯</span>
         </div>
-        <div class="metric-number" id="stat-hosts" style="color: #79c0ff;">0</div>
-        <div class="metric-subtext">Unique offending IP hosts</div>
+        <div class="metric-value" id="stat-hosts" style="color: #93c5fd;">0</div>
+        <div class="metric-footer">Unique offending IP addresses</div>
       </div>
     </section>
 
-    <!-- Visual Charts -->
-    <section class="charts-grid">
-      <div class="section-panel">
-        <div class="panel-header">
-          <div class="panel-title">Packet Ingestion Rate (Packets / Sec)</div>
+    <!-- Visual Charts Row -->
+    <section class="charts-row">
+      <div class="panel-card">
+        <div class="panel-card-header">
+          <span class="panel-card-title">Packet Ingestion Rate (Packets / Second)</span>
+          <span class="panel-card-meta">Real-time sliding window</span>
         </div>
-        <div class="chart-wrapper">
+        <div class="chart-container-box">
           <canvas id="trendChart"></canvas>
         </div>
       </div>
 
-      <div class="section-panel">
-        <div class="panel-header">
-          <div class="panel-title">Protocol Distribution</div>
+      <div class="panel-card">
+        <div class="panel-card-header">
+          <span class="panel-card-title">Protocol Breakdown</span>
+          <span class="panel-card-meta">Traffic distribution</span>
         </div>
-        <div class="chart-wrapper">
+        <div class="chart-container-box">
           <canvas id="protocolChart"></canvas>
         </div>
       </div>
     </section>
 
-    <!-- Tables -->
-    <section class="tables-grid">
+    <!-- Tables Row -->
+    <section class="tables-row">
       
-      <!-- Recent Alerts Table -->
-      <div class="section-panel">
-        <div class="panel-header">
-          <div class="panel-title">Recent Security Alerts</div>
-          <span style="font-size: 0.74rem; color: var(--text-secondary);">Real-time database feed</span>
+      <!-- Recent Alerts Table (Chapter 5.9) -->
+      <div class="panel-card">
+        <div class="panel-card-header">
+          <span class="panel-card-title">Recent Security Alerts</span>
+          <span class="panel-card-meta">Live SQLite event stream</span>
         </div>
 
-        <div class="table-scroll">
+        <div class="table-scroll-container">
           <table>
             <thead>
               <tr>
-                <th style="width: 80px;">Severity</th>
-                <th style="width: 140px;">Attack Type</th>
-                <th style="width: 220px;">Source &rarr; Target</th>
-                <th>Details</th>
+                <th style="width: 85px;">Risk</th>
+                <th style="width: 150px;">Attack Type</th>
+                <th style="width: 230px;">Source &rarr; Target</th>
+                <th>Incident Description</th>
                 <th style="width: 140px;">Timestamp</th>
               </tr>
             </thead>
             <tbody id="alerts-table-body">
               <tr>
                 <td colspan="5">
-                  <div class="empty-table-state">Loading active records...</div>
+                  <div class="empty-state">No alerts recorded yet. Network activity is normal.</div>
                 </td>
               </tr>
             </tbody>
@@ -140,25 +147,25 @@
         </div>
       </div>
 
-      <!-- Offender IP Panel -->
-      <div class="section-panel">
-        <div class="panel-header">
-          <div class="panel-title">Top Flagged Hosts</div>
+      <!-- Top Offenders List -->
+      <div class="panel-card">
+        <div class="panel-card-header">
+          <span class="panel-card-title">Top Offending Hosts</span>
         </div>
 
-        <div class="table-scroll">
+        <div class="table-scroll-container">
           <table>
             <thead>
               <tr>
                 <th>Source IP</th>
                 <th>Alerts</th>
-                <th>Severity</th>
+                <th>Peak Risk</th>
               </tr>
             </thead>
             <tbody id="offenders-table-body">
               <tr>
                 <td colspan="3">
-                  <div class="empty-table-state">No hosts flagged</div>
+                  <div class="empty-state">No hosts flagged</div>
                 </td>
               </tr>
             </tbody>
@@ -170,32 +177,30 @@
 
   </main>
 
-  <!-- In-App Confirmation Modal (No browser alert popup) -->
-  <div id="confirm-modal" class="modal-backdrop">
-    <div class="modal-dialog">
-      <div class="modal-title">Reset Database Logs</div>
-      <div class="modal-body">
-        This will permanently purge all captured network packets and security alert records from SQLite (<code>data/ids.db</code>). Are you sure?
-      </div>
-      <div class="modal-actions">
+  <!-- Custom In-App Modal Dialog (Eliminates "localhost 5000 says" popup) -->
+  <div id="confirm-modal" class="modal-overlay">
+    <div class="modal-box">
+      <h3>Reset Database Logs</h3>
+      <p>This will permanently purge all captured packet logs and security alerts from SQLite (<code>data/ids.db</code>). Are you sure?</p>
+      <div class="modal-actions-row">
         <button onclick="closeModal()" class="btn">Cancel</button>
         <button onclick="confirmResetDatabase()" class="btn btn-danger">Confirm Reset</button>
       </div>
     </div>
   </div>
 
-  <!-- Toast Notification (Clean in-app banner, replaces browser alert) -->
-  <div id="toast-notification">
+  <!-- In-App Toast Message -->
+  <div id="toast-box">
     <span id="toast-icon">ℹ️</span>
-    <span id="toast-msg">Operation completed</span>
+    <span id="toast-text">Action completed</span>
   </div>
 
-  <!-- Footer -->
+  <!-- Page Footer -->
   <footer>
-    <span>Network Intrusion Detection System &bull; Rule-Based Network Traffic Analysis Prototype</span>
-    <span>Graphic Era (Deemed to be University) &bull; 2026</span>
+    <span>Network Intrusion Detection System (NIDS) &bull; Rule-Based Traffic Monitoring</span>
+    <span>Graphic Era (Deemed to be University) &bull; BCA Mini-Project</span>
   </footer>
 
-  <script src="/static/js/dashboard.js"></script>
+  <script src="/static/js/dashboard.js?v=2.1"></script>
 </body>
 </html>

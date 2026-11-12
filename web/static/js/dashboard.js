@@ -1,4 +1,4 @@
-// Professional NIDS Dashboard Operations Script
+// Humanized Operations Script
 let protocolChart = null;
 let trafficTrendChart = null;
 
@@ -6,28 +6,28 @@ const timeLabels = [];
 const trafficDataPoints = [];
 let prevTotalPackets = 0;
 
-// Notification Toast Utility (No native browser alert)
+// Toast Helper (Replaces native browser alert)
 function showToast(message, isError = false) {
-  const toast = document.getElementById("toast-notification");
+  const box = document.getElementById("toast-box");
   const icon = document.getElementById("toast-icon");
-  const msg = document.getElementById("toast-msg");
+  const text = document.getElementById("toast-text");
 
-  icon.innerText = isError ? "❌" : "✅";
-  msg.innerText = message;
+  icon.innerText = isError ? "⚠️" : "✅";
+  text.innerText = message;
 
-  toast.classList.add("show");
+  box.classList.add("show");
   setTimeout(() => {
-    toast.classList.remove("show");
-  }, 3200);
+    box.classList.remove("show");
+  }, 3000);
 }
 
-// Modal dialog helpers (No native browser confirm dialog)
+// Modal Helpers (Replaces native confirm dialog)
 function promptResetDatabase() {
-  document.getElementById("confirm-modal").classList.add("open");
+  document.getElementById("confirm-modal").classList.add("active");
 }
 
 function closeModal() {
-  document.getElementById("confirm-modal").classList.remove("open");
+  document.getElementById("confirm-modal").classList.remove("active");
 }
 
 async function confirmResetDatabase() {
@@ -44,18 +44,18 @@ async function confirmResetDatabase() {
         fetchAlerts(),
         fetchTopOffenders()
       ]);
-      showToast("Database logs and alert history cleared successfully.");
+      showToast("All traffic logs and alerts successfully cleared.");
     } else {
-      showToast("Failed to clear database.", true);
+      showToast("Failed to reset database logs.", true);
     }
   } catch (err) {
     showToast("Server error during reset.", true);
   }
 }
 
-// Chart Initializations
+// Initialize Visual Charts
 function initCharts() {
-  // Protocol Distribution Doughnut
+  // Protocol Breakdown Doughnut Chart
   const ctxProto = document.getElementById("protocolChart").getContext("2d");
   protocolChart = new Chart(ctxProto, {
     type: "doughnut",
@@ -64,35 +64,35 @@ function initCharts() {
       datasets: [{
         data: [0, 0, 0, 0],
         backgroundColor: [
-          "#2f81f7", // Blue for TCP
-          "#38bdf8", // Light Blue for UDP
-          "#d29922", // Amber for ICMP
-          "#6e7681"  // Gray for Other
+          "#3b82f6", // Blue
+          "#06b6d4", // Cyan
+          "#f59e0b", // Amber
+          "#64748b"  // Slate
         ],
-        borderColor: "#161b22",
-        borderWidth: 2,
+        borderColor: "#131923",
+        borderWidth: 3,
         hoverOffset: 4
       }]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      cutout: "68%",
+      cutout: "70%",
       plugins: {
         legend: {
           position: "bottom",
           labels: {
-            color: "#8b949e",
-            boxWidth: 12,
+            color: "#94a3b8",
             padding: 14,
+            boxWidth: 12,
             font: { family: "'Inter', sans-serif", size: 11, weight: 500 }
           }
         },
         tooltip: {
-          backgroundColor: "#1f242c",
-          titleColor: "#e6edf3",
-          bodyColor: "#8b949e",
-          borderColor: "#30363d",
+          backgroundColor: "#18202c",
+          titleColor: "#f0f4f8",
+          bodyColor: "#94a3b8",
+          borderColor: "#263346",
           borderWidth: 1,
           padding: 8,
           cornerRadius: 6
@@ -101,21 +101,21 @@ function initCharts() {
     }
   });
 
-  // Packet Ingestion Line Chart
+  // Traffic Ingestion Rate Line Chart
   const ctxTrend = document.getElementById("trendChart").getContext("2d");
   trafficTrendChart = new Chart(ctxTrend, {
     type: "line",
     data: {
       labels: timeLabels,
       datasets: [{
-        label: "Packets / sec",
+        label: "Packets/sec",
         data: trafficDataPoints,
-        borderColor: "#2f81f7",
-        borderWidth: 1.8,
-        backgroundColor: "rgba(47, 129, 247, 0.08)",
+        borderColor: "#3b82f6",
+        borderWidth: 2,
+        backgroundColor: "rgba(59, 130, 246, 0.1)",
         fill: true,
-        tension: 0.25,
-        pointRadius: 2,
+        tension: 0.3,
+        pointRadius: 2.5,
         pointHoverRadius: 5
       }]
     },
@@ -124,22 +124,22 @@ function initCharts() {
       maintainAspectRatio: false,
       scales: {
         x: {
-          grid: { color: "#21262d" },
-          ticks: { color: "#6e7681", font: { family: "'IBM Plex Mono', monospace", size: 10 } }
+          grid: { color: "#1f2937" },
+          ticks: { color: "#64748b", font: { family: "'JetBrains Mono', monospace", size: 10 } }
         },
         y: {
           beginAtZero: true,
-          grid: { color: "#21262d" },
-          ticks: { color: "#6e7681", font: { family: "'IBM Plex Mono', monospace", size: 10 } }
+          grid: { color: "#1f2937" },
+          ticks: { color: "#64748b", font: { family: "'JetBrains Mono', monospace", size: 10 } }
         }
       },
       plugins: {
         legend: { display: false },
         tooltip: {
-          backgroundColor: "#1f242c",
-          titleColor: "#e6edf3",
-          bodyColor: "#8b949e",
-          borderColor: "#30363d",
+          backgroundColor: "#18202c",
+          titleColor: "#f0f4f8",
+          bodyColor: "#94a3b8",
+          borderColor: "#263346",
           borderWidth: 1,
           padding: 8,
           cornerRadius: 6
@@ -149,7 +149,7 @@ function initCharts() {
   });
 }
 
-// Fetch Metrics
+// Fetch System Metrics
 async function fetchMetrics() {
   try {
     const res = await fetch("/api/metrics");
@@ -173,7 +173,7 @@ async function fetchMetrics() {
     }
     trafficTrendChart.update();
   } catch (err) {
-    console.error("Failed to load metrics:", err);
+    console.error("Metrics load error:", err);
   }
 }
 
@@ -192,11 +192,11 @@ async function fetchProtocols() {
       protocolChart.update();
     }
   } catch (err) {
-    console.error("Failed to load protocols:", err);
+    console.error("Protocols load error:", err);
   }
 }
 
-// Fetch Alert Feed
+// Fetch Alert Records
 async function fetchAlerts() {
   try {
     const res = await fetch("/api/alerts?limit=15");
@@ -207,7 +207,7 @@ async function fetchAlerts() {
       tbody.innerHTML = `
         <tr>
           <td colspan="5">
-            <div class="empty-table-state">No security alerts detected. System activity is normal.</div>
+            <div class="empty-state">No alerts recorded yet. Network activity is normal.</div>
           </td>
         </tr>`;
       return;
@@ -222,23 +222,23 @@ async function fetchAlerts() {
       const tr = document.createElement("tr");
       tr.innerHTML = `
         <td><span class="badge ${badgeClass}">${a.risk_level}</span></td>
-        <td><strong>${a.attack_type}</strong></td>
+        <td><strong style="color: #f1f5f9;">${a.attack_type}</strong></td>
         <td>
           <span class="mono-ip">${a.source_ip}</span>
           <span style="color: var(--text-muted); margin: 0 4px;">&rarr;</span>
           <span class="mono-ip">${a.destination_ip}</span>
         </td>
-        <td style="color: var(--text-secondary);">${a.description}</td>
+        <td style="color: #cbd5e1; font-size: 0.82rem;">${a.description}</td>
         <td><span class="timestamp">${a.timestamp}</span></td>
       `;
       tbody.appendChild(tr);
     });
   } catch (err) {
-    console.error("Failed to load alerts:", err);
+    console.error("Alerts load error:", err);
   }
 }
 
-// Fetch Top Offending Hosts
+// Fetch Top Offending Sources
 async function fetchTopOffenders() {
   try {
     const res = await fetch("/api/top-offenders");
@@ -249,7 +249,7 @@ async function fetchTopOffenders() {
       tbody.innerHTML = `
         <tr>
           <td colspan="3">
-            <div class="empty-table-state">No offending hosts identified</div>
+            <div class="empty-state">No hosts flagged</div>
           </td>
         </tr>`;
       return;
@@ -264,17 +264,17 @@ async function fetchTopOffenders() {
       const tr = document.createElement("tr");
       tr.innerHTML = `
         <td><span class="mono-ip">${o.source_ip}</span></td>
-        <td><strong style="font-family: var(--font-mono);">${o.alert_count}</strong></td>
+        <td><strong style="font-family: var(--font-mono); font-size: 0.9rem;">${o.alert_count}</strong></td>
         <td><span class="badge ${badgeClass}">${o.highest_risk}</span></td>
       `;
       tbody.appendChild(tr);
     });
   } catch (err) {
-    console.error("Failed to load offenders:", err);
+    console.error("Offenders load error:", err);
   }
 }
 
-// Trigger Simulation (With clean in-button loading state)
+// Trigger Synthetic Attack Scenario
 async function triggerSimulation(attackType, btnElement) {
   const originalText = btnElement.innerText;
   btnElement.innerText = "Running...";
@@ -289,20 +289,19 @@ async function triggerSimulation(attackType, btnElement) {
         fetchAlerts(),
         fetchTopOffenders()
       ]);
-      const readableName = attackType.toUpperCase();
-      showToast(`Scenario [${readableName}] executed and analyzed.`);
+      showToast(`Simulation [${attackType.toUpperCase()}] executed.`);
     } else {
-      showToast("Simulation encountered an issue.", true);
+      showToast("Simulation execution failed.", true);
     }
   } catch (e) {
-    showToast("Failed to communicate with simulation engine.", true);
+    showToast("Server error during simulation.", true);
   } finally {
     btnElement.innerText = originalText;
     btnElement.disabled = false;
   }
 }
 
-// Lifecycle Init & Polling
+// Page Initialization & Polling
 document.addEventListener("DOMContentLoaded", () => {
   initCharts();
   fetchMetrics();
@@ -310,7 +309,7 @@ document.addEventListener("DOMContentLoaded", () => {
   fetchAlerts();
   fetchTopOffenders();
 
-  // Automatic live telemetry poll every 3 seconds
+  // Poll active data every 3 seconds
   setInterval(() => {
     fetchMetrics();
     fetchProtocols();
