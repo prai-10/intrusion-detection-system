@@ -19,3 +19,8 @@ ENV/
 .vscode/
 .idea/
 *.swp
+
+# College private documents, PDFs & reports (DO NOT PUSH TO GITHUB)
+docs/
+*.pdf
+*.docx
